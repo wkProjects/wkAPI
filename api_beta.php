@@ -115,7 +115,7 @@ class wkAPI
     public function setPassword($password)
     {
         $this->password = $password;
-        $this->sid = $this::pw2sid($password);
+        $this->sid = self::pw2sid($password);
     }
 
     static function pw2sid($password)
@@ -147,7 +147,7 @@ class wkAPI
         __construct2($server, $cid);
         $this->username = $username;
         $this->password = $password;
-        $this->sid = $this::pw2sid($password);
+        $this->sid = self::pw2sid($password);
     }
 
     public function getReplacers()
@@ -409,7 +409,7 @@ class wkAPI
         if ($username === false) {
             $username = $this->username;
         }
-        $sid = $password ? $this::pw2sid($password) : $this->sid;
+        $sid = $password ? self::pw2sid($password) : $this->sid;
         $server = $this->server;
         $cid = $this->cid;
         if (!$username || !$sid) {
