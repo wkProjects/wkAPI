@@ -115,7 +115,7 @@ class wkAPI
     public function setPassword($password)
     {
         $this->password = $password;
-        $this->sid = $this->pw2sid($password);
+        $this->sid = $this::pw2sid($password);
     }
 
     static function pw2sid($password)
