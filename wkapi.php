@@ -298,7 +298,7 @@ class Webkicks{
         $cid = $this->cid;
         $server = intval($this->server);
         $overview=$this->getcontents("http://server$server.webkicks.de/$cid/topadmin/$adminname/$sid");
-        preg_match_all("/<td width=\"40\">[0-9]+\.\)<\/td>\s+<td width=\"90\">([0-9a-zA-Z_]{2,20})<\/td>\s+<td width=\"160\" align=\"right\">([0-9]+ Tag\(e\) [0-9]{2}:[0-9]{2}:[0-9]{2} h)<\/td>/i",$overview,$raw);
+        preg_match_all("/<td width=\"40\">[0-9]+\.\)<\/td>\s+<td width=\"90\">([0-9a-zA-Z_]{2,20})<\/td>\s+<td align=\"right\">([0-9]+ Tag\(e\) [0-9]{2}:[0-9]{2}:[0-9]{2} h)<\/td>/i",$overview,$raw);
         $times=$raw[2];
         $names=$raw[1];
         for ($i=0;$i<count($times);$i++){
