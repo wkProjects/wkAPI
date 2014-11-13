@@ -2,9 +2,9 @@
 
 /**
  * wkAPI v2
- * 
- * Diese API stellt Funktionen bereit, mit denen Informationen zu 
- * Webkicks-Chats ermittelt und ausgegeben werden können. 
+ *
+ * Diese API stellt Funktionen bereit, mit denen Informationen zu
+ * Webkicks-Chats ermittelt und ausgegeben werden können.
  *
  * @author Bastian Schwetzel
  * @license http://opensource.org/licenses/GPL-3.0 GNU General Public License, version 3
@@ -20,15 +20,15 @@ class wkAPI
     private $password;
     private $sid;
     private $baseURL;
-    static private $urlMethod;
+    private static $urlMethod;
 
     public function __construct()
     {
         $a = func_get_args();
         $i = func_num_args();
         if (method_exists($this, $f = '__construct' . $i)) {
-            static::urlMethod = static::chooseURLMethod();
-            if ($this->urlMethod === false) {
+            static::$urlMethod = static::chooseURLMethod();
+            if (static::$urlMethod === false) {
                 throw new Exception("Es konnte keine Methode gefunden werden, HTTP-Anfragen zu stellen.");
             }
             call_user_func_array(array($this, $f), $a);
@@ -36,7 +36,7 @@ class wkAPI
             throw new Exception("Ungültige Anzahl an Argumenten.");
         }
     }
-    
+
     private function __construct2($server, $cid)
     {
         $this->server = intval($server);
@@ -47,12 +47,11 @@ class wkAPI
         if ($headers[0] !== "HTTP/1.1 200 OK") {
             throw new Exception("Chat nicht gefunden.");
         }
-
     }
-    
+
     private function __construct4($server, $cid, $username, $password)
     {
-        __construct2($server, $cid);
+        $this->__construct2($server, $cid);
         $this->username = $username;
         $this->password = $password;
         $this->sid = static::pw2sid($password);
@@ -79,12 +78,12 @@ class wkAPI
 
         return false;
     }
-    
+
     static private function getContents($url)
     {
         $return = "";
         $response = "";
-        switch ($this->urlMethod) {
+        switch (static::$urlMethod) {
             case "file_get_contents":
                 $opts = array('http' =>
                     array(
@@ -130,12 +129,12 @@ class wkAPI
 
         return $return;
     }
-    
+
     static private function postContents($url, $data)
     {
         $return = "";
         $response = "";
-        switch ($this->urlMethod) {
+        switch (static::$urlMethod) {
             case "file_get_contents":
                 $postdata = http_build_query($data);
                 $opts = array('http' =>
@@ -380,7 +379,7 @@ class wkAPI
         $server = $this->server;
         $cid = $this->cid;
         $data = array("cid" => $cid, "user" => $username, "pass" => $password, "job" => "ok");
-        $lines = static::postContents("http://server$server.webkicks.de/$cid/", $data);
+        $lines = static::postContents("http://server{$server}.webkicks.de/{$cid}/", $data);
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
         }
@@ -392,10 +391,10 @@ class wkAPI
     public function logout($username = false, $password = false)
     {
         $this->sendeText("/exit", $username, $password);
-    }
+}
 
-    //Laesst einen User einen Text senden
-    public function sendeText($message, $username = false, $password = false)
+//Lässt einen User einen Text senden
+public function sendeText($message, $username = false, $password = false)
     {
         if (!isset($message) || empty($message)) {
             return false;
