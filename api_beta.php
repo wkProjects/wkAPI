@@ -27,7 +27,7 @@ class wkAPI
         $a = func_get_args();
         $i = func_num_args();
         if (method_exists($this, $f = '__construct' . $i)) {
-            self::urlMethod = self::chooseURLMethod();
+            static::urlMethod = static::chooseURLMethod();
             if ($this->urlMethod === false) {
                 throw new Exception("Es konnte keine Methode gefunden werden, HTTP-Anfragen zu stellen.");
             }
@@ -55,7 +55,7 @@ class wkAPI
         __construct2($server, $cid);
         $this->username = $username;
         $this->password = $password;
-        $this->sid = self::pw2sid($password);
+        $this->sid = static::pw2sid($password);
     }
 
     static private function chooseURLMethod()
@@ -230,7 +230,7 @@ class wkAPI
     public function setPassword($password)
     {
         $this->password = $password;
-        $this->sid = self::pw2sid($password);
+        $this->sid = static::pw2sid($password);
     }
 
     static function pw2sid($password)
@@ -252,9 +252,9 @@ class wkAPI
     private function callWK($method, $data = false)
     {
         if (!$data) {
-            return json_decode(utf8_encode(self::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}")));
+            return json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}")));
         } else {
-            return json_decode(utf8_encode(self::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}/{$data}")));
+            return json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}/{$data}")));
         }
     }
 
@@ -358,7 +358,7 @@ class wkAPI
         if (!$username || !$sid) {
             return false;
         }
-        $response = self::getContents('http://server' . intval($this->server) . '.webkicks.de/' . $this->cid . '/index/' . strtolower($username) . '/' . $sid . '/start/main');
+        $response = static::getContents('http://server' . intval($this->server) . '.webkicks.de/' . $this->cid . '/index/' . strtolower($username) . '/' . $sid . '/start/main');
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1; //Login korrekt, nicht eingeloggt
         }
@@ -380,7 +380,7 @@ class wkAPI
         $server = $this->server;
         $cid = $this->cid;
         $data = array("cid" => $cid, "user" => $username, "pass" => $password, "job" => "ok");
-        $lines = self::postContents("http://server$server.webkicks.de/$cid/", $data);
+        $lines = static::postContents("http://server$server.webkicks.de/$cid/", $data);
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
         }
@@ -403,14 +403,14 @@ class wkAPI
         if ($username === false) {
             $username = $this->username;
         }
-        $sid = $password ? self::pw2sid($password) : $this->sid;
+        $sid = $password ? static::pw2sid($password) : $this->sid;
         $server = $this->server;
         $cid = $this->cid;
         if (!$username || !$sid) {
             return false;
         }
         $data = array("cid" => $cid, "user" => $username, "pass" => $sid, "message" => $message);
-        self::postcontents("http://server{$server}.webkicks.de/cgi-bin/chat.cgi", $data);
+        static::postcontents("http://server{$server}.webkicks.de/cgi-bin/chat.cgi", $data);
         return true;
     }
 }
