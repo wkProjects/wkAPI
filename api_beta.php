@@ -9,6 +9,8 @@
  * @author Bastian Schwetzel
  * @license http://opensource.org/licenses/GPL-3.0 GNU General Public License, version 3
  * @version 2.0
+ * Date: 12.11.2014
+ * Time: 18:57
  */
 class wkAPI
 {
@@ -20,7 +22,7 @@ class wkAPI
     private $baseURL;
     static private $urlMethod;
 
-    function __construct()
+    public function __construct()
     {
         $a = func_get_args();
         $i = func_num_args();
@@ -35,7 +37,7 @@ class wkAPI
         }
     }
     
-    function __construct2($server, $cid)
+    private function __construct2($server, $cid)
     {
         $this->server = intval($server);
         $this->cid = $cid;
@@ -48,7 +50,7 @@ class wkAPI
 
     }
     
-    function __construct4($server, $cid, $username, $password)
+    private function __construct4($server, $cid, $username, $password)
     {
         __construct2($server, $cid);
         $this->username = $username;
@@ -78,17 +80,29 @@ class wkAPI
         return false;
     }
     
-        static private function getContents($url)
+    static private function getContents($url)
     {
         $return = "";
         $response = "";
         switch ($this->urlMethod) {
             case "file_get_contents":
-                $return = file_get_contents($url);
+                $opts = array('http' =>
+                    array(
+                        'header' => 'User-Agent: wkAPI'
+                    )
+                );
+                $context = stream_context_create($opts);
+                $return = file_get_contents($url, false, $context);
                 break;
 
             case "file":
-                $content = file($url);
+                $opts = array('http' =>
+                    array(
+                        'header' => 'User-Agent: wkAPI'
+                    )
+                );
+                $context = stream_context_create($opts);
+                $content = file($url, false, $context);
                 foreach ($content as $line) {
                     $return .= $line;
                 }
@@ -127,7 +141,7 @@ class wkAPI
                 $opts = array('http' =>
                     array(
                         'method' => 'POST',
-                        'header' => 'Content-type: application/x-www-form-urlencoded',
+                        'header' => 'Content-type: application/x-www-form-urlencoded\r\nUser-Agent: wkAPI',
                         'content' => $postdata
                     )
                 );
@@ -140,7 +154,7 @@ class wkAPI
                 $opts = array('http' =>
                     array(
                         'method' => 'POST',
-                        'header' => 'Content-type: application/x-www-form-urlencoded',
+                        'header' => 'Content-type: application/x-www-form-urlencoded\r\nUser-Agent: wkAPI',
                         'content' => $postdata
                     )
                 );
