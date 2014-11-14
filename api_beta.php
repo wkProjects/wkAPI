@@ -9,20 +9,27 @@
  * @author Bastian Schwetzel
  * @license http://opensource.org/licenses/GPL-3.0 GNU General Public License, version 3
  * @version 2.0
- * Date: 12.11.2014
- * Time: 18:57
  */
 class wkAPI
 {
+    /*
+     * Basis-Informationen zum Chat
+     */
     private $server;
     private $cid;
     private $username;
     private $password;
     private $sid;
+
+    /*
+     * Hilfsvariablen für die API
+     */
+    private $cache = array();
     private $baseURL;
+    private $apiURL;
 
     private static $urlMethod;
-    private $cache = Array();
+
 
     public function getServer()
     {
@@ -88,11 +95,16 @@ class wkAPI
     {
         $this->server = intval($server);
         $this->cid = $cid;
-        $this->baseURL = $this->generateBaseURL($server, $cid);
 
-        $headers = get_headers("http://" . $this->baseURL, 1);
-        if ($headers[0] !== "HTTP/1.1 200 OK") {
-            var_dump($headers);
+        $headers = get_headers("https://server{$server}.webkicks.de/{$cid}/", 1);
+
+        if (strpos($headers[0], "200") !== false) {
+            $this->baseURL = "http://server{$server}.webkicks.de/{$cid}/";
+            $this->apiURL = $this->baseURL . "api/";
+        } elseif (strpos($headers[0], "307") !== false) {
+            $this->baseURL = "https://server{$server}.webkicks.de/{$cid}/";
+            $this->apiURL = $this->baseURL . "api/";
+        } else {
             throw new Exception("Chat nicht gefunden.");
         }
     }
@@ -245,33 +257,23 @@ class wkAPI
         return $sid;
     }
 
-    private function generateBaseURL($server, $cid)
-    {
-        return sprintf("server%d.webkicks.de/%s/", $server, $cid);
-    }
-
-    private function getApiURL()
-    {
-        return "https://" . $this->baseURL . "api/";
-    }
-
     private function callWK($method, $data = false)
     {
         if (array_key_exists($method, $this->cache)) {
             return $this->cache[$method . $data];
         }
 
-        if (empty($this->username) || empty($this->password) || $this->checkUser() === 0) {
+        if (empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$method}")));
+                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}")));
             } else {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$method}/{$data}")));
+                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}/{$data}")));
             }
         } else {
             if (!$data) {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}")));
+                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}")));
             } else {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->getApiURL() . "/{$this->username}/{$this->password}/{$method}/{$data}")));
+                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}/{$data}")));
             }
         }
     }
@@ -373,14 +375,12 @@ class wkAPI
         return $this->callWK("get_dellog");
     }
 
-    public function checkUser($username = false, $pw = false)
+    public function checkUser($username = false, $password = false)
     {
-        $username = $username ? $username : $this->username;
-        $sid = $pw ? $this->pw2sid($pw) : $this->sid;
-        if (!$username || !$sid) {
-            return 0;
-        }
-        $response = static::getContents('http://server' . intval($this->server) . '.webkicks.de/' . $this->cid . '/index/' . strtolower($username) . '/' . $sid . '/start/main');
+        $username = !$username || !$password ? $this->username : $username;
+        $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
+
+        $response = static::getContents($this->baseURL . "index/{$username}/{$sid}/start/main");
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1; //Login korrekt, nicht eingeloggt
         }
@@ -392,17 +392,10 @@ class wkAPI
 
     public function login($username = false, $password = false)
     {
-        if ($username === false) {
-            $username = $this->username;
-        }
-        if ($password === false) {
-            $password = $this->password;
-        }
-
-        $server = $this->server;
-        $cid = $this->cid;
-        $data = array("cid" => $cid, "user" => $username, "pass" => $password, "job" => "ok");
-        $lines = static::postContents("http://server{$server}.webkicks.de/{$cid}/", $data);
+        $username = !$username || !$password ? $this->username : $username;
+        $password = !$username || !$password ? $this->password : $password;
+        $data = array("cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok");
+        $lines = static::postContents($this->baseURL, $data);
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
         }
@@ -422,17 +415,10 @@ class wkAPI
         if (!isset($message) || empty($message)) {
             return false;
         }
-        if ($username === false) {
-            $username = $this->username;
-        }
-        $sid = $password ? static::pw2sid($password) : $this->sid;
-        $server = $this->server;
-        $cid = $this->cid;
-        if (!$username || !$sid) {
-            return false;
-        }
-        $data = array("cid" => $cid, "user" => $username, "pass" => $sid, "message" => $message);
-        static::postcontents("http://server{$server}.webkicks.de/cgi-bin/chat.cgi", $data);
+        $username = !$username || !$password ? $this->username : $username;
+        $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
+        $data = array("cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message);
+        static::postcontents($this->baseURL ."cgi-bin/chat.cgi", $data);
         return true;
     }
 
@@ -451,4 +437,3 @@ class wkAPI
         return in_array($username, $this->getTeam()->mods);
     }
 }
-
