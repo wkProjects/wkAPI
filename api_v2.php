@@ -79,7 +79,7 @@ class wkAPI
     }
 
     /*
-     * Dummy-Konstruktur, zählt nur die Argumente und ruft dann __construct2 oder __construct4 auf
+     * Dummy-Konstruktur, zählt nur die Argumente und ruft dann __construct0, __construct2 oder __construct4 auf
      */
     public function __construct()
     {
@@ -94,6 +94,13 @@ class wkAPI
         } else {
             throw new Exception("Ungültige Anzahl an Argumenten.");
         }
+    }
+
+    /*
+     * Dummy-Konstruktor, nur erforderlich, um die Funktion der API ohne Angabe eines Chats zu testen.
+     */
+    private function __construct0(){
+
     }
 
     /*
@@ -507,3 +514,4 @@ class wkAPI
         return in_array($username, $this->getTeam()->mods);
     }
 }
+
