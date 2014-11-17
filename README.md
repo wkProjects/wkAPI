@@ -509,7 +509,6 @@ Zwar sind im Vergleich zur Version 1 einige Funktionen weggefallen und andere um
 Die folgenden Beispiele existieren bereits für Version 1 und wurden nun für diese Version angepasst.
 
 ###Alle User samt Gesamtzahl anzeigen
-===
 
 ```PHP
 <?php
