@@ -1,15 +1,15 @@
 #wkAPI
-=====
+=
 
 Die API für Webkicks-Chats
 
 ##ToDo
-=====
+=
 
 Derzeit nichts ;-)
 
 ##Dokumentation
-=====
+=
 
 Die Dokumentation für Version 1 findet sich unter https://www.webkicks.de/forum/wkapi-f27/inoffizielle-api-fur-wkchats-t20451.html
 Um diese API einzusetzen, ist zunächst zu prüfen, ob der eigene Webspace diese unterstützt. Die diesbezüglichen Anforderungen sind:
@@ -107,7 +107,7 @@ Zu beachten ist, dass die API ihre Ergebnisse zwischenspeichert. Das heißt, das
 Außerdem eine Anmerkung: Die Reihenfolge der Attribute eines von der API zurückgegebenen Objekts ist zufällig. Lediglich die Topliste ist sortiert. Arrays (z.B. getAllUsers) sind davon nicht betroffen.
 
 ###Funktionen
-====
+
 
 ####checkUser:
 Erwartet: Benutzername, Kennwort (sonst werden die in new wkAPI() eingetragenen gewählt)
@@ -499,12 +499,12 @@ stdClass Object
 ```
 
 ###Bemerkungen
-====
+
 
 Zwar sind im Vergleich zur Version 1 einige Funktionen weggefallen und andere umbenannt werden, trotzdem kann diese API (bis auf das Setzen der Einstellungen) alle Funktionen aus Version 1 nachbilden.
 
 ##Beispiele
-====
+
 
 Die folgenden Beispiele existieren bereits für Version 1 und wurden nun für diese Version angepasst.
 
@@ -530,7 +530,7 @@ echo "Wir haben {$anzahl} registrierte Benutzer!<br /><br />\n\nListe:<br />\n".
 ```
 
 ###Details eines einzelnen Users anzeigen 
-====
+
 
 ```PHP
 <?php
@@ -565,7 +565,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ```
 
 ###Eine Onlineliste
-====
+
 
 ```PHP
 <?php
@@ -604,7 +604,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ```
 
 ###Eine Teamliste
-====
+
 
 ```PHP
 <?php
@@ -640,7 +640,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ```
 
 ###Ist ein User online?
-====
+
 
 ```PHP
 <?php
@@ -681,7 +681,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ```
 
 ###Einen User einloggen und etwas schreiben lassen
-====
+
 
 ```PHP
 <?php
