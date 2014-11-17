@@ -27,10 +27,12 @@ class wkAPI
     private $cache = array();
     private $baseURL;
     private $apiURL;
-
     private static $urlMethod;
 
 
+    /*
+     * Getter und Setter für die Basis-Informationen
+     */
     public function getServer()
     {
         return $this->server;
@@ -38,7 +40,7 @@ class wkAPI
 
     public function setServer($server)
     {
-        $this->server = $server;
+        $this->server = intval($server);
         $this->cache = array();
     }
 
@@ -76,6 +78,9 @@ class wkAPI
         $this->cache = array();
     }
 
+    /*
+     * Dummy-Konstruktur, zählt nur die Argumente und ruft dann __construct2 oder __construct4 auf
+     */
     public function __construct()
     {
         $a = func_get_args();
@@ -91,6 +96,9 @@ class wkAPI
         }
     }
 
+    /*
+     * Konstruktur für die Initialisierung mit Server und Chatname
+     */
     private function __construct2($server, $cid)
     {
         $this->server = intval($server);
@@ -109,6 +117,9 @@ class wkAPI
         }
     }
 
+    /*
+     * Konstruktor für die Initialisierung mit Server, Chatname, Benutzername und Passwort
+     */
     private function __construct4($server, $cid, $username, $password)
     {
         $this->__construct2($server, $cid);
@@ -117,6 +128,16 @@ class wkAPI
         $this->sid = static::pw2sid($password);
     }
 
+    /*
+     * Hilfsmethode, ermittelt, welche Methoden zum URL-Aufruf verwendet werden können:
+     *
+     * Nur mit allow_url_fopen:
+     * file_get_contents
+     * file
+     *
+     * Ansonsten:
+     * fsockopen
+     */
     static private function chooseURLMethod()
     {
         $allow_url_fopen = ini_get("allow_url_fopen");
@@ -139,6 +160,9 @@ class wkAPI
         return false;
     }
 
+    /*
+     * Hilfsfunktion, ruft Inhalte einer URL ab
+     */
     static private function getContents($url)
     {
         $return = "";
@@ -190,6 +214,9 @@ class wkAPI
         return $return;
     }
 
+    /*
+     * Hilfsfunktion, sendet Daten an eine URL und gibt die Antwort zurück
+     */
     static private function postContents($url, $data)
     {
         $return = "";
@@ -251,39 +278,53 @@ class wkAPI
         return $return;
     }
 
+    /*
+     * Hilfsfunktion, berechnet die SID aus dem Passwort
+     */
     static function pw2sid($password)
     {
         $sid = preg_replace("/[^a-zA-Z0-9.$]/", "", crypt($password, "88"));
         return $sid;
     }
 
-    private function callWK($method, $data = false)
+    /*
+     * Hilfsfunktion, ruft alle von Webkicks bereitgestellten APIs auf und gibt die resultierenden Objekte zurück
+     */
+    private function callWK($method, $data = false, $adminRequest = true)
     {
         if (array_key_exists($method, $this->cache)) {
-            return $this->cache[$method . $data];
+            return $this->cache[$method . "|" . $data . "|" . $adminRequest];
         }
 
-        if (empty($this->username) || empty($this->password)) {
+        if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}")));
             } else {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}/{$data}")));
             }
         } else {
             if (!$data) {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}")));
             } else {
-                return $this->cache[$method] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}/{$data}")));
             }
         }
     }
 
-    public function getToplist()
+    /*
+     * Ruft die Topliste ab
+     *
+     * Wenn $asAdmin auf false steht, wird die Anfrage an die öffentliche Topliste gestellt, ansonsten wird die im Admin-
+     * Menü abrufbare Toplist abgefragt. Dazu sind natürlich gültige Admin-Daten erforderlich.
+     * Außerdem wird die Topliste hier absteigend nach Zeit sortiert.
+     */
+    public function getToplist($asAdmin = true)
     {
         if (array_key_exists(__METHOD__, $this->cache)) {
             return $this->cache[__METHOD__];
         }
-        $toplist = json_decode(json_encode($this->callWK("get_toplist")), true);
+
+        $toplist = json_decode(json_encode($this->callWK("get_toplist", false, $asAdmin)), true);
         uasort($toplist, function ($a, $b) {
             if ($a["totalseconds"] == $b["totalseconds"]) {
                 return 0;
@@ -295,6 +336,10 @@ class wkAPI
         return $this->cache[__METHOD__] = json_decode(json_encode($toplist), false);
     }
 
+    /*
+     * Die folgenden Funktionen sind nur Wrapper für die Webkicks-APIs und geben das empfangene JSON schlicht als Objekt
+     * zurück.
+     */
     public function getReplacers()
     {
         return $this->callWK("get_replacers");
@@ -303,11 +348,6 @@ class wkAPI
     public function getSettings()
     {
         return $this->callWK("get_settings");
-    }
-
-    public function getUserdata($username)
-    {
-        return $this->callWK("get_userdata", $username);
     }
 
     public function getTeam()
@@ -375,6 +415,23 @@ class wkAPI
         return $this->callWK("get_dellog");
     }
 
+    /*
+     * Diese Funktion erwartet noch einen Benutzernamen, über den die Infos aus der Datenbank geholt werden sollen.
+     */
+    public function getUserdata($username)
+    {
+        return $this->callWK("get_userdata", $username);
+    }
+
+    /*
+     * checkUser prüft Logindaten (entweder die im Objekt hinterlegten oder die für diese Methode übergebenen) auf ihre
+     * Gültigkeit.
+     *
+     * Rückgabewerte:
+     * 0 = Logindaten sind nicht gültig, User gekickt o.ä.
+     * 1 = Logindaten sind korrekt, der User ist aber nicht eingeloggt
+     * 2 = Logindaten sind korrekt, außerdem ist der User eingeloggt.
+     */
     public function checkUser($username = false, $password = false)
     {
         $username = !$username || !$password ? $this->username : $username;
@@ -382,18 +439,23 @@ class wkAPI
 
         $response = static::getContents($this->baseURL . "index/{$username}/{$sid}/start/main");
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
-            return 1; //Login korrekt, nicht eingeloggt
+            return 1;
         }
         if (preg_match('@<title>Chat-Input</title>@is', $response)) {
-            return 2; //Login korrekt, eingeloggt
+            return 2;
         }
         return 0;
     }
 
+    /*
+     * Loggt einen User ein, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
+     * identifizierten.
+     */
     public function login($username = false, $password = false)
     {
         $username = !$username || !$password ? $this->username : $username;
         $password = !$username || !$password ? $this->password : $password;
+
         $data = array("cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok");
         $lines = static::postContents($this->baseURL, $data);
         if (preg_match("/Fehler:/", $lines) == 1) {
@@ -402,14 +464,19 @@ class wkAPI
         return true;
     }
 
-    //Loggt einen User aus
-
+    /*
+     * Loggt einen User aus, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
+     * identifizierten.
+     */
     public function logout($username = false, $password = false)
     {
         $this->sendeText("/exit", $username, $password);
     }
 
-    //Lässt einen User einen Text senden
+    /*
+     * Lässt einen User, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort identifizierten,
+     * einen Text senden.
+     */
     public function sendeText($message, $username = false, $password = false)
     {
         if (!isset($message) || empty($message)) {
@@ -422,6 +489,9 @@ class wkAPI
         return true;
     }
 
+    /*
+     * Methoden, um den Rang eines Users abzufragen. isAdmin gibt dabei auch für Hauptadmins true zurück
+     */
     public function isHauptadmin($username)
     {
         return $this->getTeam()->hauptadmin == $username;
