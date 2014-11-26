@@ -114,11 +114,11 @@ class wkAPI
         $headers = get_headers("https://server{$server}.webkicks.de/{$cid}/", 1);
 
         if (strpos($headers[0], "200") !== false) {
-            $this->baseURL = "http://server{$server}.webkicks.de/{$cid}/";
-            $this->apiURL = $this->baseURL . "api/";
-        } elseif (strpos($headers[0], "307") !== false) {
             $this->baseURL = "https://server{$server}.webkicks.de/{$cid}/";
-            $this->apiURL = $this->baseURL . "api/";
+            $this->apiURL = "https://$server{$server}.webkicks.de/{$cid}/api/";
+        } elseif (strpos($headers[0], "307") !== false) {
+            $this->baseURL = "http://server{$server}.webkicks.de/{$cid}/";
+            $this->apiURL = "http://server{$server}.webkicks.de/{$cid}/api/";
         } else {
             throw new Exception("Chat nicht gefunden.");
         }
