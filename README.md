@@ -1,15 +1,15 @@
-#wkAPI
-=
+# wkAPI
+
 
 Die API für Webkicks-Chats
 
-##ToDo
-=
+## ToDo
+
 
 Derzeit nichts ;-)
 
-##Dokumentation
-=
+## Dokumentation
+
 
 Die Dokumentation für Version 1 findet sich unter https://www.webkicks.de/forum/wkapi-f27/inoffizielle-api-fur-wkchats-t20451.html
 Um diese API einzusetzen, ist zunächst zu prüfen, ob der eigene Webspace diese unterstützt. Die diesbezüglichen Anforderungen sind:
@@ -106,40 +106,40 @@ Zu beachten ist, dass die API ihre Ergebnisse zwischenspeichert. Das heißt, das
 
 Außerdem eine Anmerkung: Die Reihenfolge der Attribute eines von der API zurückgegebenen Objekts ist zufällig. Lediglich die Topliste ist sortiert. Arrays (z.B. getAllUsers) sind davon nicht betroffen.
 
-###Funktionen
+### Funktionen
 
 
-####checkUser:
+#### checkUser:
 Erwartet: Benutzername, Kennwort (sonst werden die in new wkAPI() eingetragenen gewählt)
 Rückgabe: 0: Passwort nicht korrekt/User existiert nicht
 1: User und Passwort korrekt, der User ist aber Offline
 2: User und Passwort korrekt, der User ist Online
 
-####login:
+#### login:
 Erwartet: Benutzername, Kennwort (sonst werden die in new wkAPI() eingetragenen gewählt)
 Rückgabe: True, wenn der Login erfolgreich war, sonst false
 
-####logout:
+#### logout:
 Erwartet: Benutzername, Kennwort (sonst werden die in new wkAPI() eingetragenen gewählt)
 Rückgabe: - (Loggt den User aus)
 
-####sendeText:
+#### sendeText:
 Erwartet: Nachricht, Benutzername, Kennwort (sonst werden die in new wkAPI() eingetragenen gewählt)
 Rückgabe: True, wenn Nachricht gesendet wurde, sonst false
 
-####isHauptadmin:
+#### isHauptadmin:
 Erwartet: Username
 Rückgabe: true, wenn der User Hauptadmin ist, sonst false
 
-####isAdmin:
+#### isAdmin:
 Erwartet: Username
 Rückgabe: true, wenn der User Admin oder Hauptadmin ist, sonst false
 
-####isMod:
+#### isMod:
 Erwartet: Username
 Rückgabe: true, wenn der User Mod ist, sonst false
 
-####getUserdata:
+#### getUserdata:
 Erwartet: Username
 Rückgabe: Objekt, das alle Daten des Users enthält. Als Beispiel:
 
@@ -170,7 +170,7 @@ stdClass Object
 )
 ```
 
-####getAnkuendigungen:
+#### getAnkuendigungen:
 Erwartet: -
 Rückgabe: Objekt mit den Ankündigungen. Beispiel (keine Team-Ankündigung gesetzt):
 
@@ -183,7 +183,7 @@ stdClass Object
 )
 ```
 
-####getReplacers:
+#### getReplacers:
 Erwartet: -
 Rückgabe: Objekt mit den Replacern. Beispiel (natürlich gekürzt):
 
@@ -201,7 +201,7 @@ stdClass Object
 )
 ```
 
-####getToplist:
+#### getToplist:
 Erwartet: true/false
 Rückgabe: Wenn false (oder irgendetwas anderes als true) übergeben wird, die öffentliche Topliste, ansonsten die Admin-Topliste. Format:
 
@@ -228,7 +228,7 @@ stdClass Object
 )
 ```
 
-####getTeam:
+#### getTeam:
 Erwartet: -
 Rückgabe: Objekt mit den Teammitgliedern. Admins und Mods sind jeweils Arrays, der Hauptadmin ein String. Format:
 
@@ -251,7 +251,7 @@ stdClass Object
 )
 ```
 
-####getAllUsers:
+#### getAllUsers:
 Erwartet: -
 Rückgabe: Array, das jeden User enthält:
 
@@ -266,7 +266,7 @@ Array
 )
 ```
 
-####getKickedUsers:
+#### getKickedUsers:
 Erwartet: -
 Rückgabe: Array, das jeden gekickten User enthält. Format s. getAllUsers
 
@@ -281,15 +281,15 @@ Array
 )
 ```
 
-####getMutedUsers:
+#### getMutedUsers:
 Erwartet: -
 Rückgabe: Array, das jeden geknebelten User enthält. Format s. getAllUsers
 
-####getLockedUsers:
+#### getLockedUsers:
 Erwartet: -
 Rückgabe: Array, das jeden nicht freigeschalteten User enthält. Format s. getAllUsers
 
-####getChannels:
+#### getChannels:
 Erwartet: -
 Rückgabe: Objekt mit Array aller Räume und Infos, ob Räume aktiviert und auf der Loginseite wählbar sind. Format: 
 
@@ -307,7 +307,7 @@ stdClass Object
 )
 ```
 
-####getOnlineUsers:
+#### getOnlineUsers:
 Erwartet: -
 Rückgabe: Ein Array mit allen Usern, die derzeit online sind. Format:
 
@@ -345,7 +345,7 @@ stdClass Object
 )
 ```
 
-####getReglog:
+#### getReglog:
 Erwartet: -
 Rückgabe: Array der zuletzt registrierten User (Timestamp, Datum, Uhrzeit, Nick). Format:
 
@@ -381,7 +381,7 @@ Array
 )
 ```
 
-####getCmdLog:
+#### getCmdLog:
 Erwartet: -
 Rückgabe: Array des Befehlslogs (Timestamp, Datum, Uhrzeit, Nick, Aktion, Ziel). Format:
 
@@ -410,7 +410,7 @@ Array
 )
 ```
 
-####getFehlzugriffe:
+#### getFehlzugriffe:
 Erwartet: -
 Rückgabe: Array der letzten Fehlzugriffe (Timestamp, Datum, Uhrzeit, Nick, IP)
 
@@ -437,7 +437,7 @@ Array
 )
 ```
 
-####getDeletelog:
+#### getDeletelog:
 Erwartet: Username, SID (sonst Werte aus new Webkicks())
 Rückgabe: Array der letzten Userlöschungen (Datum, Uhrzeit, Nick)
 
@@ -473,7 +473,7 @@ Array
 )
 ```
 
-####getSettings:
+#### getSettings:
 Erwartet: 
 Rückgabe: Objekt der Einstellungen auf der Einstellungsseite. Format:
 
@@ -498,17 +498,17 @@ stdClass Object
 )
 ```
 
-###Bemerkungen
+### Bemerkungen
 
 
 Zwar sind im Vergleich zur Version 1 einige Funktionen weggefallen und andere umbenannt werden, trotzdem kann diese API (bis auf das Setzen der Einstellungen) alle Funktionen aus Version 1 nachbilden.
 
-##Beispiele
+## Beispiele
 
 
 Die folgenden Beispiele existieren bereits für Version 1 und wurden nun für diese Version angepasst.
 
-###Alle User samt Gesamtzahl anzeigen
+### Alle User samt Gesamtzahl anzeigen
 
 ```PHP
 <?php
@@ -528,7 +528,7 @@ echo "Wir haben {$anzahl} registrierte Benutzer!<br /><br />\n\nListe:<br />\n".
 ?>
 ```
 
-###Details eines einzelnen Users anzeigen 
+### Details eines einzelnen Users anzeigen 
 
 
 ```PHP
@@ -563,7 +563,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ?>
 ```
 
-###Eine Onlineliste
+### Eine Onlineliste
 
 
 ```PHP
@@ -602,7 +602,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ?>
 ```
 
-###Eine Teamliste
+### Eine Teamliste
 
 
 ```PHP
@@ -638,7 +638,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ?>
 ```
 
-###Ist ein User online?
+### Ist ein User online?
 
 
 ```PHP
@@ -679,7 +679,7 @@ if (version_compare(PHP_VERSION, '5.3.0') >= 0){
 ?>
 ```
 
-###Einen User einloggen und etwas schreiben lassen
+### Einen User einloggen und etwas schreiben lassen
 
 
 ```PHP
