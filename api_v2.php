@@ -490,7 +490,7 @@ class wkAPI
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
         $data = array("cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message);
-        static::postcontents($this->baseURL ."cgi-bin/chat.cgi", $data);
+        static::postcontents("https://server{$this->server}.webkicks.de/cgi-bin/chat.cgi, $data);
         return true;
     }
 
