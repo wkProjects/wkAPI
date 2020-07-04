@@ -345,6 +345,12 @@ class wkAPI
      * Die folgenden Funktionen sind nur Wrapper für die Webkicks-APIs und geben das empfangene JSON schlicht als Objekt
      * zurück.
      */
+    
+    public function getSid()
+    {
+        return $this->callWK("get_sid");
+    }
+
     public function getReplacers()
     {
         return $this->callWK("get_replacers");
