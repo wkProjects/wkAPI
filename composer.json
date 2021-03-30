@@ -1,0 +1,7 @@
+{
+    "name": "wkprojects/wkapi",
+    "description": "Provides methods for interaction with the API of Webkicks chats",
+    "require": {
+        "php": ">=7.4"
+    }
+}
