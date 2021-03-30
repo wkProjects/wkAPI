@@ -2,6 +2,11 @@
     "name": "wkprojects/wkapi",
     "description": "Provides methods for interaction with the API of Webkicks chats",
     "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "wkprojects\\": "src/"
+        }
+    },
     "require": {
         "php": ">=7.4"
     }
