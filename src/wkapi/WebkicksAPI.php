@@ -144,15 +144,15 @@ class WebkicksAPI {
 
         if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")->getBody()));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")->getBody()));
             }
         } else {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")->getBody()));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")->getBody()));
             }
         }
     }
@@ -289,7 +289,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
 
-        $response = $this->httpClient->get($this->baseURL . "index/{$username}/{$sid}/start/main");
+        $response = $this->httpClient->get($this->baseURL . "index/{$username}/{$sid}/start/main")->getBody();
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1;
         }
@@ -309,7 +309,7 @@ class WebkicksAPI {
         $password = !$username || !$password ? $this->password : $password;
 
         $data = array("cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok");
-        $lines = $this->httpClient->post($this->baseURL, ['form_params' => $data]);
+        $lines = $this->httpClient->post($this->baseURL, ['form_params' => $data])->getBody();
 
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
