@@ -2,4 +2,4 @@ image: gitpod/workspace-full
 
 tasks:
   - init: composer install
-    command: composer install
+
