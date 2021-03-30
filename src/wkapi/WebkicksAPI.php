@@ -2,6 +2,9 @@
 
 namespace wkprojects\wkapi;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+
 class WebkicksAPI {
     /*
      * Basis-Informationen zum Chat
@@ -17,8 +20,7 @@ class WebkicksAPI {
      */
     private $cache = array();
     private $baseURL;
-    private $apiURL;
-    private static $urlMethod;
+    private Client $httpClient;
 
 
     /*
@@ -77,13 +79,9 @@ class WebkicksAPI {
         $a = func_get_args();
         $i = func_num_args();
         if (method_exists($this, $f = '__construct' . $i)) {
-            static::$urlMethod = static::chooseURLMethod();
-            if (static::$urlMethod === false) {
-                throw new Exception("Es konnte keine Methode gefunden werden, HTTP-Anfragen zu stellen.");
-            }
             call_user_func_array(array($this, $f), $a);
         } else {
-            throw new Exception("Ungültige Anzahl an Argumenten.");
+            throw new \Exception("no constructor found for arguments");
         }
     }
 
@@ -101,15 +99,16 @@ class WebkicksAPI {
     {
         $this->server = intval($server);
         $this->cid = $cid;
-        $this->apiURL = "https://server{$server}.webkicks.de/{$cid}/api/";
-        $headers = get_headers("https://server{$server}.webkicks.de/{$cid}/", 1);
+        $this->httpClient = new Client([
+            'base_uri' => "https://server{$server}.webkicks.de",
+            'timeout'  => 10,
+            'headers' => ['User-Agent' => 'wkAPI']
+        ]);
 
-        if (strpos($headers[0], "200") !== false) {
-            $this->baseURL = "https://server{$server}.webkicks.de/{$cid}/";
-        } elseif (strpos($headers[0], "307") !== false) {
-            $this->baseURL = "http://server{$server}.webkicks.de/{$cid}/";
-        } else {
-            throw new Exception("Chat nicht gefunden.");
+        try {
+        $response = $this->httpClient->head("/{$cid}/");
+        } catch (ClientException $e) {
+            throw new \Exception("Chat nicht gefunden.", $e);
         }
     }
 
@@ -124,155 +123,6 @@ class WebkicksAPI {
         $this->sid = static::pw2sid($password);
     }
 
-    /*
-     * Hilfsmethode, ermittelt, welche Methoden zum URL-Aufruf verwendet werden können:
-     *
-     * Nur mit allow_url_fopen:
-     * file_get_contents
-     * file
-     *
-     * Ansonsten:
-     * fsockopen
-     */
-    static private function chooseURLMethod()
-    {
-        $allow_url_fopen = ini_get("allow_url_fopen");
-        $disabled_functions = explode(",", ini_get("disable_functions"));
-
-        if ($allow_url_fopen == true && (!in_array("file_get_contents", $disabled_functions) || !in_array("file", $disabled_functions))) {
-            if (!in_array("file_get_contents", $disabled_functions)) {
-                return "file_get_contents";  //file_get_contents() kann benutzt werden
-            }
-            if (!in_array("file", $disabled_functions)) {
-                return "file";  //file() kann benutzt werden
-            }
-
-        }
-
-        if (!in_array("fsockopen", $disabled_functions)) {
-            return "fsockopen";  //fsockopen() kann benutzt werden
-        }
-
-        return false;
-    }
-
-    /*
-     * Hilfsfunktion, ruft Inhalte einer URL ab
-     */
-    static private function getContents($url)
-    {
-        $return = "";
-        $response = "";
-        switch (static::$urlMethod) {
-            case "file_get_contents":
-                $opts = array('http' =>
-                    array(
-                        'header' => 'User-Agent: wkAPI'
-                    )
-                );
-                $context = stream_context_create($opts);
-                $return = file_get_contents($url, false, $context);
-                break;
-
-            case "file":
-                $opts = array('http' =>
-                    array(
-                        'header' => 'User-Agent: wkAPI'
-                    )
-                );
-                $context = stream_context_create($opts);
-                $content = file($url, false, $context);
-                foreach ($content as $line) {
-                    $return .= $line;
-                }
-                break;
-
-            case "fsockopen":
-                $components = parse_url($url);
-                $fp = fsockopen($components['host'], 80, $errno, $errstr, 30);
-                if (!$fp) {
-                    return false;
-                }
-                $request = "GET " . $components ['path'] . (isset($components['query']) ? "?" . $components['query'] : "") . " HTTP/1.0\r\n";
-                $request .= "Host: " . $components ['host'] . "\r\n";
-                $request .= "User-Agent: wkAPI\r\n";
-                $request .= "Connection: Close\r\n\r\n";
-                fwrite($fp, $request);
-                while (!feof($fp)) {
-                    $response .= fgets($fp, 1024);
-                }
-                fclose($fp);
-                $responseSplit = explode("\r\n\r\n", $response, 2);
-                $return = $responseSplit[1];
-                break;
-        }
-
-        return $return;
-    }
-
-    /*
-     * Hilfsfunktion, sendet Daten an eine URL und gibt die Antwort zurück
-     */
-    static private function postContents($url, $data)
-    {
-        $return = "";
-        $response = "";
-        switch (static::$urlMethod) {
-            case "file_get_contents":
-                $postdata = http_build_query($data);
-                $opts = array('http' =>
-                    array(
-                        'method' => 'POST',
-                        'header' => 'Content-type: application/x-www-form-urlencoded\r\nUser-Agent: wkAPI',
-                        'content' => $postdata
-                    )
-                );
-                $context = stream_context_create($opts);
-                $return = file_get_contents($url, false, $context);
-                break;
-
-            case "file":
-                $postdata = http_build_query($data);
-                $opts = array('http' =>
-                    array(
-                        'method' => 'POST',
-                        'header' => 'Content-type: application/x-www-form-urlencoded\r\nUser-Agent: wkAPI',
-                        'content' => $postdata
-                    )
-                );
-                $context = stream_context_create($opts);
-                $result = file($url, false, $context);
-                foreach ($result as $line) {
-                    $return .= $line;
-                }
-                break;
-
-            case "fsockopen":
-                $components = parse_url($url);
-                $postdata = http_build_query($data);
-                $fp = fsockopen($components['host'], 80, $errno, $errstr, 30);
-                if (!$fp) {
-                    return false;
-                }
-                $request = "POST " . $components ['path'] . (isset($components['query']) ? "?" . $components['query'] : "") . " HTTP/1.0\r\n";
-                $request .= "Host: " . $components ['host'] . "\r\n";
-                $request .= "Content-type: application/x-www-form-urlencoded\r\n";
-                $request .= "User-Agent: wkAPI\r\n";
-                $request .= "Content-length: " . strlen($postdata) . "\r\n";
-                $request .= "Connection: Close\r\n\r\n";
-                $request .= $postdata;
-                fwrite($fp, $request);
-                while (!feof($fp)) {
-                    $response .= fgets($fp, 1024);
-                }
-                fclose($fp);
-                $responseSplit = explode("\r\n\r\n", $response, 2);
-                $return = $responseSplit[1];
-                break;
-        }
-
-        return $return;
-    }
 
     /*
      * Hilfsfunktion, berechnet die SID aus dem Passwort
@@ -294,15 +144,15 @@ class WebkicksAPI {
 
         if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")));
             }
         } else {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode(static::getContents($this->apiURL . "{$this->username}/{$this->password}/{$method}/{$data}")));
+                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")));
             }
         }
     }
@@ -439,7 +289,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
 
-        $response = static::getContents($this->baseURL . "index/{$username}/{$sid}/start/main");
+        $response = $this->httpClient->get($this->baseURL . "index/{$username}/{$sid}/start/main");
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1;
         }
@@ -459,7 +309,8 @@ class WebkicksAPI {
         $password = !$username || !$password ? $this->password : $password;
 
         $data = array("cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok");
-        $lines = static::postContents($this->baseURL, $data);
+        $lines = $this->httpClient->post($this->baseURL, ['form_params' => $data]);
+
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
         }
@@ -487,7 +338,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
         $data = array("cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message);
-        static::postcontents("https://server{$this->server}.webkicks.de/cgi-bin/chat.cgi", $data);
+        $this->httpClient->post("https://server{$this->server}.webkicks.de/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
     }
 
