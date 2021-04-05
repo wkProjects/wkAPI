@@ -18,7 +18,7 @@ class WebkicksAPI {
     /*
      * Hilfsvariablen für die API
      */
-    private $cache = array();
+    private $cache = [];
     private $baseURL;
     private Client $httpClient;
 
@@ -34,7 +34,7 @@ class WebkicksAPI {
     public function setServer($server)
     {
         $this->server = intval($server);
-        $this->cache = array();
+        $this->cache = [];
     }
 
     public function getCid()
@@ -45,7 +45,7 @@ class WebkicksAPI {
     public function setCid($cid)
     {
         $this->cid = $cid;
-        $this->cache = array();
+        $this->cache = [];
     }
 
     public function getUsername()
@@ -56,7 +56,7 @@ class WebkicksAPI {
     public function setUsername($username)
     {
         $this->username = $username;
-        $this->cache = array();
+        $this->cache = [];
     }
 
     public function getPassword()
@@ -68,7 +68,7 @@ class WebkicksAPI {
     {
         $this->password = $password;
         $this->sid = static::pw2sid($password);
-        $this->cache = array();
+        $this->cache = [];
     }
 
     /*
@@ -79,7 +79,7 @@ class WebkicksAPI {
         $a = func_get_args();
         $i = func_num_args();
         if (method_exists($this, $f = '__construct' . $i)) {
-            call_user_func_array(array($this, $f), $a);
+            call_user_func_array([$this, $f], $a);
         } else {
             throw new \Exception("no constructor found for arguments");
         }
@@ -186,7 +186,7 @@ class WebkicksAPI {
      * Die folgenden Funktionen sind nur Wrapper für die Webkicks-APIs und geben das empfangene JSON schlicht als Objekt
      * zurück.
      */
-    
+
     public function getSid()
     {
         return $this->callWK("get_sid");
@@ -308,7 +308,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $password = !$username || !$password ? $this->password : $password;
 
-        $data = array("cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok");
+        $data = ["cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok"];
         $lines = $this->httpClient->post($this->baseURL, ['form_params' => $data])->getBody();
 
         if (preg_match("/Fehler:/", $lines) == 1) {
@@ -337,7 +337,7 @@ class WebkicksAPI {
         }
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
-        $data = array("cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message);
+        $data = ["cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message];
         $this->httpClient->post("https://server{$this->server}.webkicks.de/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
     }
