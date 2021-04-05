@@ -71,58 +71,28 @@ class WebkicksAPI {
         $this->cache = [];
     }
 
-    /*
-     * Dummy-Konstruktur, zählt nur die Argumente und ruft dann __construct0, __construct2 oder __construct4 auf
-     */
-    public function __construct()
+    public function __construct(int $server = null, string $cid = null, string $username = null, string $password = null, string $sid = null)
     {
-        $a = func_get_args();
-        $i = func_num_args();
-        if (method_exists($this, $f = '__construct' . $i)) {
-            call_user_func_array([$this, $f], $a);
-        } else {
-            throw new \Exception("no constructor found for arguments");
+        if (is_null($server) || is_null($cid)) {
+            throw new \Exception("At least server and cid are required");
         }
-    }
 
-    /*
-     * Dummy-Konstruktor, nur erforderlich, um die Funktion der API ohne Angabe eines Chats zu testen.
-     */
-    private function __construct0(){
-
-    }
-
-    /*
-     * Konstruktur für die Initialisierung mit Server und Chatname
-     */
-    private function __construct2($server, $cid)
-    {
         $this->server = intval($server);
         $this->cid = $cid;
+        $this->username = $username;
+        $this->password = $password;
+        $this->sid = $sid;
         $this->httpClient = new Client([
             'base_uri' => "https://server{$server}.webkicks.de",
             'timeout'  => 10,
             'headers' => ['User-Agent' => 'wkAPI']
         ]);
-
         try {
-        $response = $this->httpClient->head("/{$cid}/");
+            $response = $this->httpClient->head("/{$cid}/");
         } catch (ClientException $e) {
-            throw new \Exception("Chat nicht gefunden.", $e);
+            throw new \Exception("", $e);
         }
     }
-
-    /*
-     * Konstruktor für die Initialisierung mit Server, Chatname, Benutzername und Passwort
-     */
-    private function __construct4($server, $cid, $username, $password)
-    {
-        $this->__construct2($server, $cid);
-        $this->username = $username;
-        $this->password = $password;
-        $this->sid = static::pw2sid($password);
-    }
-
 
     /*
      * Hilfsfunktion, berechnet die SID aus dem Passwort
