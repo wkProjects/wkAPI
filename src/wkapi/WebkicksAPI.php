@@ -100,21 +100,17 @@ class WebkicksAPI {
      */
     private function callWK($method, $data = false, $adminRequest = true)
     {
-        if (array_key_exists($method, $this->cache)) {
-            return $this->cache[$method . "|" . $data . "|" . $adminRequest];
-        }
-
         if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")->getBody()));
+                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")->getBody()));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")->getBody()));
+                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")->getBody()));
             }
         } else {
             if (!$data) {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")->getBody()));
+                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")->getBody()));
             } else {
-                return $this->cache[$method . "|" . $data . "|" . $adminRequest] = json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")->getBody()));
+                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")->getBody()));
             }
         }
     }
@@ -128,10 +124,6 @@ class WebkicksAPI {
      */
     public function getToplist($asAdmin = true)
     {
-        if (array_key_exists(__METHOD__, $this->cache)) {
-            return $this->cache[__METHOD__];
-        }
-
         $toplist = json_decode(json_encode($this->callWK("get_toplist", false, $asAdmin)), true);
         uasort($toplist, function ($a, $b) {
             if ($a["totalseconds"] == $b["totalseconds"]) {
@@ -141,7 +133,7 @@ class WebkicksAPI {
 
         });
 
-        return $this->cache[__METHOD__] = json_decode(json_encode($toplist), false);
+        json_decode(json_encode($toplist), false);
     }
 
     /*
