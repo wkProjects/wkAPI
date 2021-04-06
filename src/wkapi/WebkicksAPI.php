@@ -95,9 +95,6 @@ class WebkicksAPI {
         }
     }
 
-    /*
-     * Hilfsfunktion, ruft alle von Webkicks bereitgestellten APIs auf und gibt die resultierenden Objekte zurück
-     */
     private function callWK($method, $data = false, $adminRequest = true)
     {
         if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
@@ -115,13 +112,6 @@ class WebkicksAPI {
         }
     }
 
-    /*
-     * Ruft die Topliste ab
-     *
-     * Wenn $asAdmin auf false steht, wird die Anfrage an die öffentliche Topliste gestellt, ansonsten wird die im Admin-
-     * Menü abrufbare Toplist abgefragt. Dazu sind natürlich gültige Admin-Daten erforderlich.
-     * Außerdem wird die Topliste hier absteigend nach Zeit sortiert.
-     */
     public function getToplist($asAdmin = true)
     {
         $toplist = json_decode(json_encode($this->callWK("get_toplist", false, $asAdmin)), true);
@@ -135,11 +125,6 @@ class WebkicksAPI {
 
         json_decode(json_encode($toplist), false);
     }
-
-    /*
-     * Die folgenden Funktionen sind nur Wrapper für die Webkicks-APIs und geben das empfangene JSON schlicht als Objekt
-     * zurück.
-     */
 
     public function getApiSid()
     {
@@ -229,15 +214,6 @@ class WebkicksAPI {
         return $this->callWK("get_userdata", $username);
     }
 
-    /*
-     * checkUser prüft Logindaten (entweder die im Objekt hinterlegten oder die für diese Methode übergebenen) auf ihre
-     * Gültigkeit.
-     *
-     * Rückgabewerte:
-     * 0 = Logindaten sind nicht gültig, User gekickt o.ä.
-     * 1 = Logindaten sind korrekt, der User ist aber nicht eingeloggt
-     * 2 = Logindaten sind korrekt, außerdem ist der User eingeloggt.
-     */
     public function checkUser()
     {
         $response = $this->httpClient->get("/{$this->cid}/index/{$this->username}/{$this->sid}/start/main")->getBody();
@@ -250,10 +226,6 @@ class WebkicksAPI {
         return 0;
     }
 
-    /*
-     * Loggt einen User ein, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
-     * identifizierten.
-     */
     public function login()
     {
         $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->password, "job" => "ok"];
@@ -265,19 +237,11 @@ class WebkicksAPI {
         return true;
     }
 
-    /*
-     * Loggt einen User aus, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
-     * identifizierten.
-     */
     public function logout()
     {
         $this->sendeText("/exit");
     }
 
-    /*
-     * Lässt einen User, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort identifizierten,
-     * einen Text senden.
-     */
     public function sendeText($message)
     {
         if (empty($message)) {
@@ -289,9 +253,6 @@ class WebkicksAPI {
         return true;
     }
 
-    /*
-     * Methoden, um den Rang eines Users abzufragen. isAdmin gibt dabei auch für Hauptadmins true zurück
-     */
     public function isHauptadmin($username)
     {
         return $this->getTeam()->hauptadmin == $username;
