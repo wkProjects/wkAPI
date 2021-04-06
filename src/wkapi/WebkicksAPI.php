@@ -121,7 +121,7 @@ class WebkicksAPI
 
     public function getToplist($asAdmin = true)
     {
-        $toplist = json_decode(json_encode($this->callWK("get_toplist", false, $asAdmin)), true);
+        $toplist = json_decode(json_encode($this->callWK("get_toplist", $asAdmin)), true);
         uasort($toplist, function ($a, $b) {
             if ($a["totalseconds"] == $b["totalseconds"]) {
                 return 0;
