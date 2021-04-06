@@ -92,7 +92,9 @@ class WebkicksAPI
         if (!is_null($sid)) {
             $this->sid = $sid;
         } else {
-            $this->sid = $this->getApiSid()->sid;
+            if (!is_null($username) && !is_null($password)) {
+                $this->sid = $this->getApiSid()->sid;
+            }
         }
 
         try {
