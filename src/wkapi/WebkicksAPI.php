@@ -216,9 +216,6 @@ class WebkicksAPI
         return $this->callWK("get_dellog");
     }
 
-    /*
-     * Diese Funktion erwartet noch einen Benutzernamen, über den die Infos aus der Datenbank geholt werden sollen.
-     */
     public function getUserdata($username)
     {
         return $this->callWK("get_userdata", $username);
