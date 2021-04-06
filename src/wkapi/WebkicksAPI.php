@@ -6,27 +6,16 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 class WebkicksAPI {
-    /*
-     * Basis-Informationen zum Chat
-     */
-    private $server;
-    private $cid;
-    private $username;
-    private $password;
-    private $sid;
 
-    /*
-     * Hilfsvariablen für die API
-     */
-    private $cache = [];
-    private $baseURL;
+    private string $server;
+    private string $cid;
+    private string $username;
+    private string $password;
+    private string $sid;
+
     private Client $httpClient;
 
-
-    /*
-     * Getter und Setter für die Basis-Informationen
-     */
-    public function getServer()
+    public function getServer(): string
     {
         return $this->server;
     }
@@ -37,7 +26,7 @@ class WebkicksAPI {
         $this->cache = [];
     }
 
-    public function getCid()
+    public function getCid(): string
     {
         return $this->cid;
     }
@@ -48,7 +37,7 @@ class WebkicksAPI {
         $this->cache = [];
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -59,7 +48,7 @@ class WebkicksAPI {
         $this->cache = [];
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -71,24 +60,35 @@ class WebkicksAPI {
         $this->cache = [];
     }
 
-    public function __construct(int $server = null, string $cid = null, string $username = null, string $password = null, string $sid = null)
+    public function getSid(): string
+    {
+        return $this->sid;
+    }
+
+    public function setSid($sid)
+    {
+        $this->sid = $sid;
+        $this->cache = [];
+    }
+
+    public function __construct(string $server = null, string $cid = null, string $username = null, string $password = null, string $sid = null)
     {
         if (is_null($server) || is_null($cid)) {
             throw new \Exception("At least server and cid are required");
         }
 
-        $this->server = intval($server);
+        $this->server = $server;
         $this->cid = $cid;
         $this->username = $username;
         $this->password = $password;
         $this->sid = $sid;
         $this->httpClient = new Client([
-            'base_uri' => "https://server{$server}.webkicks.de",
+            'base_uri' => "https://{$server}.webkicks.de",
             'timeout'  => 10,
             'headers' => ['User-Agent' => 'wkAPI']
         ]);
         try {
-            $response = $this->httpClient->head("/{$cid}/");
+            $response = $this->httpClient->head("/{$cid}");
         } catch (ClientException $e) {
             throw new \Exception("", $e);
         }
