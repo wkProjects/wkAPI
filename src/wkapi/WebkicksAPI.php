@@ -248,9 +248,6 @@ class WebkicksAPI {
      */
     public function checkUser()
     {
-        $username = !$username || !$password ? $this->username : $username;
-        $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
-
         $response = $this->httpClient->get("/{$this->cid}/index/{$this->username}/{$this->sid}/start/main")->getBody();
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1;
@@ -267,10 +264,7 @@ class WebkicksAPI {
      */
     public function login()
     {
-        $username = !$username || !$password ? $this->username : $username;
-        $password = !$username || !$password ? $this->password : $password;
-
-        $data = ["cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok"];
+        $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->password, "job" => "ok"];
         $lines = $this->httpClient->post("/{$this->cid}", ['form_params' => $data])->getBody();
 
         if (preg_match("/Fehler:/", $lines) == 1) {
