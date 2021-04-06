@@ -89,7 +89,7 @@ class WebkicksAPI {
         }
 
         try {
-            $response = $this->httpClient->head("/{$cid}");
+            $this->httpClient->head("/{$cid}");
         } catch (ClientException $e) {
             throw new \Exception("", $e);
         }
