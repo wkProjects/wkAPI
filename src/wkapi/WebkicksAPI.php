@@ -97,7 +97,7 @@ class WebkicksAPI
         }
     }
 
-    private function callWK($method, bool $with_credentials = true, $parameter = null)
+    public function callWK($method, bool $with_credentials = true, $parameter = null)
     {
         $wkResponse = null;
         $postData = [
