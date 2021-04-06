@@ -4,6 +4,7 @@ namespace wkprojects\wkapi;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\TransferException;
 
 class WebkicksAPI
 {
@@ -97,27 +98,28 @@ class WebkicksAPI
         try {
             $this->httpClient->head("/{$cid}");
         } catch (ClientException $e) {
-            throw new \Exception("", $e);
+            throw new \Exception("The chat could not be found", $e);
         }
     }
 
-    private function callWK($method, $data = false, $adminRequest = true): ?\stdClass
+    private function callWK($method, bool $with_credentials = true, $parameter = null): ?\stdClass
     {
         $wkResponse = null;
-        if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
-            if (!$data) {
-                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$method}");
-            } else {
-                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}");
-            }
-        } else {
-            if (!$data) {
-                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}");
-            } else {
-                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}");
-            }
+        $postData = [
+            'job' => $method
+        ];
+        if ($with_credentials === true) {
+            $postData['user'] = $this->username;
+            $postData['pass'] = $this->password;
         }
-
+        if (!is_null($parameter)) {
+            $postData['message'] = $parameter;
+        }
+        try {
+            $wkResponse = $this->httpClient->post("/{$this->getCid()}/api", ['form_params' => $postData]);
+        } catch (TransferException  $e) {
+            throw new \Exception("The API call failed", $e);
+        }
         return json_decode(utf8_encode($wkResponse->getBody()));
     }
 
