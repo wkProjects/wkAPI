@@ -149,7 +149,10 @@ class WebkicksAPI
 
     public function getTeam()
     {
-        return $this->callWK("get_teamlist_json");
+        $teamlist = $this->callWK("get_teamlist_json");
+        $teamlist->founder = $teamlist->hauptadmin;
+        unset($teamlist->hauptadmin);
+        return $teamlist;
     }
 
     public function getOnlineList()
@@ -256,17 +259,17 @@ class WebkicksAPI
         return true;
     }
 
-    public function isHauptadmin($username)
+    public function isFounder($username)
     {
-        return $this->getTeam()->hauptadmin == $username;
+        return $this->getTeam()->founder === $username;
     }
 
-    public function isAdmin($username)
+    public function hasAdminPrivileges($username)
     {
-        return $this->isHauptadmin($username) || in_array($username, $this->getTeam()->admins);
+        return $this->isFounder($username) || in_array($username, $this->getTeam()->admins);
     }
 
-    public function isMod($username)
+    public function hasModPrivileges($username)
     {
         return in_array($username, $this->getTeam()->mods);
     }
