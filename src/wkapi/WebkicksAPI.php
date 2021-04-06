@@ -5,7 +5,8 @@ namespace wkprojects\wkapi;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-class WebkicksAPI {
+class WebkicksAPI
+{
 
     private string $server;
     private string $cid;
@@ -65,8 +66,13 @@ class WebkicksAPI {
         $this->sid = $sid;
     }
 
-    public function __construct(string $server = null, string $cid = null, string $username = null, string $password = null, string $sid = null)
-    {
+    public function __construct(
+        string $server = null,
+        string $cid = null,
+        string $username = null,
+        string $password = null,
+        string $sid = null
+    ) {
         if (is_null($server) || is_null($cid)) {
             throw new \Exception("At least server and cid are required");
         }
@@ -95,21 +101,24 @@ class WebkicksAPI {
         }
     }
 
-    private function callWK($method, $data = false, $adminRequest = true)
+    private function callWK($method, $data = false, $adminRequest = true): ?\stdClass
     {
+        $wkResponse = null;
         if ($adminRequest !== true || empty($this->username) || empty($this->password)) {
             if (!$data) {
-                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}")->getBody()));
+                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$method}");
             } else {
-                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}")->getBody()));
+                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$method}/{$data}");
             }
         } else {
             if (!$data) {
-                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}")->getBody()));
+                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}");
             } else {
-                return json_decode(utf8_encode($this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}")->getBody()));
+                $wkResponse = $this->httpClient->get("/{$this->getCid()}/api/{$this->username}/{$this->password}/{$method}/{$data}");
             }
         }
+
+        return json_decode(utf8_encode($wkResponse->getBody()));
     }
 
     public function getToplist($asAdmin = true)
@@ -120,7 +129,6 @@ class WebkicksAPI {
                 return 0;
             }
             return ($a["totalseconds"] < $b["totalseconds"] ? +1 : -1);
-
         });
 
         json_decode(json_encode($toplist), false);

@@ -10,5 +10,8 @@
     "require": {
         "php": ">=7.4",
         "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.5"
     }
 }
