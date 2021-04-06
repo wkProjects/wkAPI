@@ -11,9 +11,9 @@ class WebkicksAPI
 
     private string $server;
     private string $cid;
-    private string $username;
-    private string $password;
-    private string $sid;
+    private ?string $username;
+    private ?string $password;
+    private ?string $sid;
 
     private Client $httpClient;
 
