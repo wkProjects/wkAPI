@@ -56,7 +56,7 @@ class WebkicksAPI {
     public function setPassword($password)
     {
         $this->password = $password;
-        $this->sid = static::pw2sid($password);
+        $this->sid = null;
         $this->cache = [];
     }
 
@@ -81,26 +81,24 @@ class WebkicksAPI {
         $this->cid = $cid;
         $this->username = $username;
         $this->password = $password;
-        $this->sid = $sid;
+
         $this->httpClient = new Client([
             'base_uri' => "https://{$server}.webkicks.de",
             'timeout'  => 10,
             'headers' => ['User-Agent' => 'wkAPI']
         ]);
+
+        if (!is_null($sid)) {
+            $this->sid = $sid;
+        } else {
+            $this->sid = $this->getApiSid()->sid;
+        }
+
         try {
             $response = $this->httpClient->head("/{$cid}");
         } catch (ClientException $e) {
             throw new \Exception("", $e);
         }
-    }
-
-    /*
-     * Hilfsfunktion, berechnet die SID aus dem Passwort
-     */
-    static function pw2sid($password)
-    {
-        $sid = preg_replace("/[^a-zA-Z0-9.$]/", "", crypt($password, "88"));
-        return $sid;
     }
 
     /*
@@ -254,7 +252,7 @@ class WebkicksAPI {
      * 1 = Logindaten sind korrekt, der User ist aber nicht eingeloggt
      * 2 = Logindaten sind korrekt, außerdem ist der User eingeloggt.
      */
-    public function checkUser($username = false, $password = false)
+    public function checkUser()
     {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
@@ -273,7 +271,7 @@ class WebkicksAPI {
      * Loggt einen User ein, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
      * identifizierten.
      */
-    public function login($username = false, $password = false)
+    public function login()
     {
         $username = !$username || !$password ? $this->username : $username;
         $password = !$username || !$password ? $this->password : $password;
@@ -291,23 +289,22 @@ class WebkicksAPI {
      * Loggt einen User aus, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort
      * identifizierten.
      */
-    public function logout($username = false, $password = false)
+    public function logout()
     {
-        $this->sendeText("/exit", $username, $password);
+        $this->sendeText("/exit");
     }
 
     /*
      * Lässt einen User, entweder den im Objekt hinterlegten, oder einen durch Username und Passwort identifizierten,
      * einen Text senden.
      */
-    public function sendeText($message, $username = false, $password = false)
+    public function sendeText($message)
     {
-        if (!isset($message) || empty($message)) {
+        if (empty($message)) {
             return false;
         }
-        $username = !$username || !$password ? $this->username : $username;
-        $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
-        $data = ["cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message];
+
+        $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->sid, "message" => $message];
         $this->httpClient->post("/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
     }
