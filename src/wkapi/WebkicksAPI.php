@@ -101,7 +101,8 @@ class WebkicksAPI
     {
         $wkResponse = null;
         $postData = [
-            'job' => $method
+            'job' => $method,
+            'cid' => $this->getCid()
         ];
         if ($with_credentials === true) {
             $postData['user'] = $this->username;
