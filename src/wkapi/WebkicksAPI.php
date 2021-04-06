@@ -20,7 +20,7 @@ class WebkicksAPI {
         return $this->server;
     }
 
-    public function setServer($server)
+    public function setServer(string $server)
     {
         $this->server = $server;
     }
@@ -30,7 +30,7 @@ class WebkicksAPI {
         return $this->cid;
     }
 
-    public function setCid($cid)
+    public function setCid(string $cid)
     {
         $this->cid = $cid;
     }
@@ -40,7 +40,7 @@ class WebkicksAPI {
         return $this->username;
     }
 
-    public function setUsername($username)
+    public function setUsername(string $username)
     {
         $this->username = $username;
     }
@@ -50,7 +50,7 @@ class WebkicksAPI {
         return $this->password;
     }
 
-    public function setPassword($password)
+    public function setPassword(string $password)
     {
         $this->password = $password;
     }
@@ -60,7 +60,7 @@ class WebkicksAPI {
         return $this->sid;
     }
 
-    public function setSid($sid)
+    public function setSid(string $sid)
     {
         $this->sid = $sid;
     }
