@@ -259,7 +259,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
 
-        $response = $this->httpClient->get($this->baseURL . "index/{$username}/{$sid}/start/main")->getBody();
+        $response = $this->httpClient->get("/{$this->cid}/index/{$this->username}/{$this->sid}/start/main")->getBody();
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1;
         }
@@ -279,7 +279,7 @@ class WebkicksAPI {
         $password = !$username || !$password ? $this->password : $password;
 
         $data = ["cid" => $this->cid, "user" => $username, "pass" => $password, "job" => "ok"];
-        $lines = $this->httpClient->post($this->baseURL, ['form_params' => $data])->getBody();
+        $lines = $this->httpClient->post("/{$this->cid}", ['form_params' => $data])->getBody();
 
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
@@ -308,7 +308,7 @@ class WebkicksAPI {
         $username = !$username || !$password ? $this->username : $username;
         $sid = !$username || !$password ? $this->sid : static::pw2sid($password);
         $data = ["cid" => $this->cid, "user" => $username, "pass" => $sid, "message" => $message];
-        $this->httpClient->post("https://server{$this->server}.webkicks.de/cgi-bin/chat.cgi", ['form_params' => $data]);
+        $this->httpClient->post("/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
     }
 
