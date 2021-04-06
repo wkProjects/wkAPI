@@ -82,20 +82,13 @@ class WebkicksAPI
         $this->cid = $cid;
         $this->username = $username;
         $this->password = $password;
+        $this->sid = $sid;
 
         $this->httpClient = new Client([
             'base_uri' => "https://{$server}.webkicks.de",
             'timeout'  => 10,
             'headers' => ['User-Agent' => 'wkAPI']
         ]);
-
-        if (!is_null($sid)) {
-            $this->sid = $sid;
-        } else {
-            if (!is_null($username) && !is_null($password)) {
-                $this->sid = $this->getApiSid()->sid;
-            }
-        }
 
         try {
             $this->httpClient->head("/{$cid}");
