@@ -157,7 +157,7 @@ class WebkicksAPI {
      * zurück.
      */
 
-    public function getSid()
+    public function getApiSid()
     {
         return $this->callWK("get_sid");
     }
