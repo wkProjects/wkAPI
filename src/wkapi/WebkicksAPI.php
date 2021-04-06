@@ -22,8 +22,7 @@ class WebkicksAPI {
 
     public function setServer($server)
     {
-        $this->server = intval($server);
-        $this->cache = [];
+        $this->server = $server;
     }
 
     public function getCid(): string
@@ -34,7 +33,6 @@ class WebkicksAPI {
     public function setCid($cid)
     {
         $this->cid = $cid;
-        $this->cache = [];
     }
 
     public function getUsername(): string
@@ -45,7 +43,6 @@ class WebkicksAPI {
     public function setUsername($username)
     {
         $this->username = $username;
-        $this->cache = [];
     }
 
     public function getPassword(): string
@@ -56,8 +53,6 @@ class WebkicksAPI {
     public function setPassword($password)
     {
         $this->password = $password;
-        $this->sid = null;
-        $this->cache = [];
     }
 
     public function getSid(): string
@@ -68,7 +63,6 @@ class WebkicksAPI {
     public function setSid($sid)
     {
         $this->sid = $sid;
-        $this->cache = [];
     }
 
     public function __construct(string $server = null, string $cid = null, string $username = null, string $password = null, string $sid = null)
