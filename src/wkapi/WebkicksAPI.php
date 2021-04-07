@@ -129,7 +129,7 @@ class WebkicksAPI
             return ($a["totalseconds"] < $b["totalseconds"] ? +1 : -1);
         });
 
-        json_decode(json_encode($toplist), false);
+        return json_decode(json_encode($toplist), false);
     }
 
     public function getApiSid()
