@@ -37,7 +37,7 @@ class WebkicksAPI
         $this->cid = $cid;
     }
 
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -47,7 +47,7 @@ class WebkicksAPI
         $this->username = $username;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -58,7 +58,7 @@ class WebkicksAPI
         $this->sid = null;
     }
 
-    public function getSid(): string
+    public function getSid(): ?string
     {
         return $this->sid;
     }
