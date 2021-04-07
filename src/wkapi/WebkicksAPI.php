@@ -239,7 +239,7 @@ class WebkicksAPI
     public function login()
     {
         $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->password, "job" => "ok"];
-        $lines = $this->httpClient->post("/{$this->cid}", ['form_params' => $data])->getBody();
+        $lines = $this->httpClient->post("/{$this->cid}/", ['form_params' => $data])->getBody();
 
         if (preg_match("/Fehler:/", $lines) == 1) {
             return false;
