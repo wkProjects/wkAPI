@@ -245,10 +245,10 @@ class WebkicksAPI
 
     public function logout()
     {
-        $this->sendeText("/exit");
+        $this->sendMessage("/exit");
     }
 
-    public function sendeText($message)
+    public function sendMessage($message)
     {
         if (empty($message)) {
             return false;
