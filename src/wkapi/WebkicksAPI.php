@@ -16,6 +16,7 @@ class WebkicksAPI
     private ?string $sid;
 
     private Client $httpClient;
+    private \stdClass $teamlist;
 
     public function getServer(): string
     {
@@ -272,16 +273,19 @@ class WebkicksAPI
 
     public function isFounder($username)
     {
-        return strtolower($this->getTeam()->founder) === strtolower($username);
+        $this->teamlist ??= $this->getTeam();
+        return strtolower($this->teamlist->founder) === strtolower($username);
     }
 
     public function hasAdminPrivileges($username)
     {
-        return $this->isFounder($username) || in_array(strtolower($username), array_map('strtolower', $this->getTeam()->admins));
+        $this->teamlist ??= $this->getTeam();
+        return $this->isFounder($username) || in_array(strtolower($username), array_map('strtolower', $this->teamlist->admins));
     }
 
     public function hasModPrivileges($username)
     {
-        return in_array(strtolower($username), array_map('strtolower', $this->getTeam()->mods));
+        $this->teamlist ??= $this->getTeam();
+        return $this->hasAdminPrivileges(strtolower($username)) || in_array(strtolower($username), array_map('strtolower', $this->teamlist->mods));
     }
 }
