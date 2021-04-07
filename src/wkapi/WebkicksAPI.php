@@ -116,7 +116,7 @@ class WebkicksAPI
         } catch (TransferException  $e) {
             throw new \Exception("The API call failed", $e);
         }
-        return json_decode(utf8_encode($wkResponse->getBody()));
+        return json_decode($wkResponse->getBody());
     }
 
     public function getToplist($asAdmin = true)
