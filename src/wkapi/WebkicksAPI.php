@@ -97,7 +97,7 @@ class WebkicksAPI
         }
     }
 
-    public function callWK($method, bool $with_credentials = true, $parameter = null)
+    public function callWK($method, $parameter = null, bool $with_credentials = true)
     {
         $wkResponse = null;
         $postData = [
@@ -121,7 +121,7 @@ class WebkicksAPI
 
     public function getToplist($asAdmin = true)
     {
-        $toplist = json_decode(json_encode($this->callWK("get_toplist", $asAdmin)), true);
+        $toplist = json_decode(json_encode($this->callWK("get_toplist")), true);
         uasort($toplist, function ($a, $b) {
             if ($a["totalseconds"] == $b["totalseconds"]) {
                 return 0;
