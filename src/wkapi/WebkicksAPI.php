@@ -260,7 +260,12 @@ class WebkicksAPI
         if (is_null($this->sid)) {
             $this->sid = $this->getApiSid();
         }
-        $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->sid, "message" => $message];
+        $data = [
+            "cid" => $this->cid,
+            "user" => $this->username,
+            "pass" => $this->sid,
+            "message" => utf8_decode($message)
+        ];
         $this->httpClient->post("/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
     }
