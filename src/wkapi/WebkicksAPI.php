@@ -261,16 +261,16 @@ class WebkicksAPI
 
     public function isFounder($username)
     {
-        return $this->getTeam()->founder === $username;
+        return strtolower($this->getTeam()->founder) === strtolower($username);
     }
 
     public function hasAdminPrivileges($username)
     {
-        return $this->isFounder($username) || in_array($username, $this->getTeam()->admins);
+        return $this->isFounder($username) || in_array(strtolower($username), array_map('strtolower', $this->getTeam()->admins));
     }
 
     public function hasModPrivileges($username)
     {
-        return in_array($username, $this->getTeam()->mods);
+        return in_array(strtolower($username), array_map('strtolower', $this->getTeam()->mods));
     }
 }
