@@ -55,6 +55,7 @@ class WebkicksAPI
     public function setPassword(string $password)
     {
         $this->password = $password;
+        $this->sid = null;
     }
 
     public function getSid(): string
@@ -134,7 +135,7 @@ class WebkicksAPI
 
     public function getApiSid()
     {
-        return $this->callWK("get_sid");
+        return $this->callWK("get_sid")->sid;
     }
 
     public function getReplacers()
@@ -222,6 +223,9 @@ class WebkicksAPI
 
     public function checkUser()
     {
+        if (is_null($this->sid)) {
+            $this->sid = $this->getApiSid();
+        }
         $response = $this->httpClient->get("/{$this->cid}/index/{$this->username}/{$this->sid}/start/main")->getBody();
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
             return 1;
@@ -253,7 +257,9 @@ class WebkicksAPI
         if (empty($message)) {
             return false;
         }
-
+        if (is_null($this->sid)) {
+            $this->sid = $this->getApiSid();
+        }
         $data = ["cid" => $this->cid, "user" => $this->username, "pass" => $this->sid, "message" => $message];
         $this->httpClient->post("/cgi-bin/chat.cgi", ['form_params' => $data]);
         return true;
