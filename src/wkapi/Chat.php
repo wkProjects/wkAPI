@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\TransferException;
 
-class WebkicksAPI
+class Chat
 {
 
     private string $server;
@@ -228,13 +228,18 @@ class WebkicksAPI
             $this->sid = $this->getApiSid();
         }
         $response = $this->httpClient->get("/{$this->cid}/index/{$this->username}/{$this->sid}/start/main")->getBody();
+        if (preg_match('@Falscher Benutzername@is', $response)) {
+            return Constants::USER_NOT_FOUND;
+        }
+        if (preg_match('@pass_remind@is', $response)) {
+            return Constants::USER_CREDENTIALS_INCORRECT;
+        }
         if (preg_match('@Fehler: Timeout. Bitte neu einloggen.@is', $response)) {
-            return 1;
+            return Constants::USER_CREDENTIALS_CORRECT;
         }
         if (preg_match('@<title>Chat-Input</title>@is', $response)) {
-            return 2;
-        }
-        return 0;
+            return Constants::USER_CREDENTIALS_CORRECT_AND_LOGGED_IN;
+        }      
     }
 
     public function login()
