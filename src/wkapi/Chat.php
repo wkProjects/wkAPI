@@ -95,7 +95,7 @@ class Chat
         try {
             $this->httpClient->head("/{$cid}");
         } catch (ClientException $e) {
-            throw new \Exception("The chat could not be found", $e);
+            throw new \Exception("The chat could not be found", 0, $e);
         }
     }
 
