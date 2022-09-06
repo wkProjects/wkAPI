@@ -99,6 +99,7 @@ class Chat
         }
     }
 
+
     public function callWK($method, $parameter = null, bool $with_credentials = true)
     {
         $wkResponse = null;
@@ -116,12 +117,12 @@ class Chat
         try {
             $wkResponse = $this->httpClient->post("/{$this->getCid()}/api", ['form_params' => $postData]);
         } catch (TransferException  $e) {
-            throw new \Exception("The API call failed", $e);
+            throw new \Exception("The API call failed", 1, $e);
         }
         return json_decode($wkResponse->getBody());
     }
 
-    public function getToplist($asAdmin = true)
+    public function getToplist(bool $asAdmin = true): array
     {
         $toplist = json_decode(json_encode($this->callWK("get_toplist")), true);
         uasort($toplist, function ($a, $b) {
@@ -239,7 +240,7 @@ class Chat
         }
         if (preg_match('@<title>Chat-Input</title>@is', $response)) {
             return Constants::USER_CREDENTIALS_CORRECT_AND_LOGGED_IN;
-        }      
+        }
     }
 
     public function login()
